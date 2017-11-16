@@ -10,19 +10,22 @@ spec:
     - logger_tls_period: 10
 ---
 apiVersion: k8s.kolide.com/v1alpha1
-kind: OsqueryDecorators
+kind: OsqueryDecorator
 spec:
-  decorators:
-    - name: hostname
-      query: select hostname from system_info;
-      type: interval
-      interval: 10
-    - name: uuid
-      query: select uuid from osquery_info;
-      type: load
-    - name: instance_id
-      query: select instance_id from osquery_info;
-      type: load
+  query: hostname
+  type: interval
+  interval: 10
+---
+apiVersion: k8s.kolide.com/v1alpha1
+kind: OsqueryDecorator
+spec:
+  query: uuid
+  type: load
+---
+apiVersion: k8s.kolide.com/v1alpha
+kind: OsqueryDecorator
+  query: instance_id
+  type: load
 ---
 apiVersion: k8s.kolide.com/v1alpha1
 kind: OsqueryFIM
@@ -39,72 +42,77 @@ spec:
           - /Users/%/Documents/%%
 ---
 apiVersion: k8s.kolide.com/v1alpha1
-kind: OsqueryLabels
+kind: OsqueryLabel
 spec:
-  labels:
-    - name: all_hosts
-      query: select 1;
-    - name: macs
-      query: select 1 from os_version where platform = "darwin";
-    - name: ubuntu
-      query: select 1 from os_version where platform = "ubuntu";
-    - name: centos
-      query: select 1 from os_version where platform = "centos";
-    - name: windows
-      query: select 1 from os_version where platform = "windows";
-    - name: pending_updates
-      query: SELECT value from plist where path = "/Library/Preferences/ManagedInstalls.plist" and key = "PendingUpdateCount" and value > "0";
-      platforms:
-        - darwin
-    - name: slack_not_running
-      query: >
-        SELECT * from system_info
-        WHERE NOT EXISTS (
-          SELECT *
-          FROM processes
-          WHERE name LIKE "%Slack%"
-        );
+  name: all_hosts
+  query: always_true
+---
+apiVersion: k8s.kolide.com/v1alpha1
+kind: OsqueryLabel
+spec:
+  name: macs
+  query: darwin_hosts
+---
+apiVersion: k8s.kolide.com/v1alpha1
+kind: OsqueryLabel
+spec:
+  name: ubuntu
+  query: ubuntu_hosts
+---
+apiVersion: k8s.kolide.com/v1alpha1
+kind: OsqueryLabel
+spec:
+  name: centos
+  query: centos_hosts
+---
+apiVersion: k8s.kolide.com/v1alpha1
+kind: OsqueryLabel
+spec:
+  name: windows
+  query: windows_hosts
+---
+apiVersion: k8s.kolide.com/v1alpha1
+kind: OsqueryLabel
+spec:
+  query: pending_updates
+  platforms:
+    - darwin
+---
+apiVersion: k8s.kolide.com/v1alpha1
+kind: OsqueryLabel
+spec:
+  query: slack_not_running
 ---
 apiVersion: k8s.kolide.com/v1alpha1
 kind: OsqueryPack
-metadata:
-  name: osquery_monitoring
 spec:
+  name: osquery_monitoring
   targets:
     labels:
       - all_hosts
   queries:
-    - name: osquery_version
+    - query: osquery_version
+      name: osquery_version_snapshot
       interval: 7200
       snapshot: true
-    - name: osquery_schedule
+    - query: osquery_version
+      name: osquery_version_differential
+      interval: 7200
+    - query: osquery_schedule
       interval: 7200
       removed: false
-    - name: osquery_events
+    - query: osquery_events
       interval: 86400
       removed: false
-    - name: oquery_info
+    - query: oquery_info
       interval: 600
       removed: false
-apiVersion: k8s.kolide.com/v1alpha1
-kind: OsqueryQuery
-metadata:
-  name: docker_processes
-  descriptions: The docker containers processes that are running on a system.
-spec:
-  query: select * from docker_container_processes;
-  support:
-    osquery: 2.9.0
-    platforms:
-      - linux
-      - darwin
 ---
 apiVersion: k8s.kolide.com/v1alpha1
 kind: OsqueryQuery
-metadata:
+spec:
   name: osquery_version
   description: The version of the Launcher and Osquery process
-spec:
   query: select launcher.version, osquery.version from kolide_launcher_info launcher, osquery_info osquery;
   support:
     launcher: 0.3.0
@@ -112,24 +120,100 @@ spec:
 ---
 apiVersion: k8s.kolide.com/v1alpha1
 kind: OsqueryQuery
-metadata:
+spec:
   name: osquery_schedule
   description: Report performance stats for each file in the query schedule.
-spec:
   query: select name, interval, executions, output_size, wall_time, (user_time/executions) as avg_user_time, (system_time/executions) as avg_system_time, average_memory, last_executed from osquery_schedule;
 ---
 apiVersion: k8s.kolide.com/v1alpha1
 kind: OsqueryQuery
-metadata:
+spec:
   name: osquery_info
   description: A heartbeat counter that reports general performance (CPU, memory) and version.
-spec:
   query: select i.*, p.resident_size, p.user_time, p.system_time, time.minutes as counter from osquery_info i, processes p, time where p.pid = i.pid;
 ---
 apiVersion: k8s.kolide.com/v1alpha1
 kind: OsqueryQuery
-metadata:
+spec:
   name: osquery_events
   description: Report event publisher health and track event counters.
-spec:
   query: select name, publisher, type, subscriptions, events, active from osquery_events;
+apiVersion: k8s.kolide.com/v1alpha1
+---
+apiVersion: k8s.kolide.com/v1/alpha1
+kind: OsqueryQuery
+spec:
+  name: docker_processes
+  descriptions: The docker containers processes that are running on a system.
+  query: select * from docker_container_processes;
+  support:
+    osquery: 2.9.0
+    platforms:
+      - linux
+      - darwin
+---
+apiVersion: k8s.kolide.com/v1/alpha1
+kind: OsqueryQuery
+spec:
+  name: hostname
+  query: select hostname from system_info;
+---
+apiVersion: k8s.kolide.com/v1/alpha1
+kind: OsqueryQuery
+spec:
+  name: uuid
+  query: select uuid from osquery_info;
+---
+apiVersion: k8s.kolide.com/v1/alpha1
+kind: OsqueryQuery
+spec:
+  name: instance_id
+  query: select instance_id from system_info;
+---
+apiVersion: k8s.kolide.com/v1/alpha1
+kind: OsqueryQuery
+spec:
+  name: always_true
+  query: select 1;
+---
+apiVersion: k8s.kolide.com/v1/alpha1
+kind: OsqueryQuery
+spec:
+  name: pending_updates
+  query: SELECT value from plist where path = "/Library/Preferences/ManagedInstalls.plist" and key = "PendingUpdateCount" and value > "0";
+---
+apiVersion: k8s.kolide.com/v1/alpha1
+kind: OsqueryQuery
+spec:
+  name: slack_not_running
+  query: >
+    SELECT * from system_info
+    WHERE NOT EXISTS (
+      SELECT *
+      FROM processes
+      WHERE name LIKE "%Slack%"
+    );
+---
+apiVersion: k8s.kolide.com/v1/alpha1
+kind: OsqueryQuery
+spec:
+  name: centos_hosts
+  query: select 1 from os_version where platform = "centos";
+---
+apiVersion: k8s.kolide.com/v1/alpha1
+kind: OsqueryQuery
+spec:
+  name: ubuntu_hosts
+  query: select 1 from os_version where platform = "ubuntu";
+---
+apiVersion: k8s.kolide.com/v1/alpha1
+kind: OsqueryQuery
+spec:
+  name: windows_hosts
+  query: select 1 from os_version where platform = "windows";
+---
+apiVersion: k8s.kolide.com/v1/alpha1
+kind: OsqueryQuery
+spec:
+  name: darwin_hosts
+  query: select 1 from os_version where platform = "darwin";
