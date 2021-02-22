@@ -1,6 +1,6 @@
 ---
 name: Internal - New project
-about: Kick off a new company-sponsored project to ship particular improvements to Fleet
+about: Kick off a new, company-sponsored project to ship particular improvements to Fleet
 title: ''
 labels: 'project'
 assignees: ''
@@ -24,7 +24,7 @@ assignees: ''
   - [ ] **If applicable:** Visual design
     - [ ] Design research
     - [ ] Lo-fi wireframes (personal draft in Figma)
-      - [ ] Vision review w/ @edamamedesign, directional/aesthetic revisions 
+      - [ ] Vision review w/ @edamamedesign, directional/aesthetic revisions
       - [ ] Practical review w/ @mikermcneil, simplifying/UX revisions
     - [ ] Hi-fi wireframes (shared project in Figma)
       - [ ] Engineering review w/ @zachw, tactical revisions
@@ -48,7 +48,7 @@ assignees: ''
     - [ ] Release blog post published
     - [ ] Release announced…
       - [ ] …in osquery Slack
-      - [ ] …on social media 
+      - [ ] …on social media
         - [ ] https://twitter.com/fleetctl
         - [ ] https://linkedin.com/company/fleetdm
         - [ ] https://www.facebook.com/fleetdm
