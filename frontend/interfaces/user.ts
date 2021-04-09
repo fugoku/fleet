@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import teamInterface, { ITeam } from './team';
 
 export default PropTypes.shape({
   admin: PropTypes.bool,
@@ -10,6 +11,7 @@ export default PropTypes.shape({
   name: PropTypes.string,
   position: PropTypes.string,
   username: PropTypes.string,
+  teams: PropTypes.arrayOf(teamInterface),
 });
 
 export interface IUser {
@@ -22,4 +24,6 @@ export interface IUser {
   name: string,
   position: string,
   username: string,
+  teams: ITeam[];
+  global_role: string | null;
 }
