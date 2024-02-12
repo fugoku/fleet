@@ -1,6 +1,6 @@
 import React from "react";
 
-import { DEFAULT_EMPTY_CELL_VALUE } from "utilities/constants";
+import { formatSeverity } from "utilities/helpers";
 import { ISoftwareVulnerability } from "interfaces/software";
 
 import paths from "router/paths";
@@ -9,7 +9,7 @@ import TextCell from "components/TableContainer/DataTable/TextCell";
 import TooltipWrapper from "components/TooltipWrapper";
 import { HumanTimeDiffWithDateTip } from "components/HumanTimeDiffWithDateTip";
 import PremiumFeatureIconWithTooltip from "components/PremiumFeatureIconWithTooltip";
-import ProbabilityOfExploitCell from "components/ProbabilityOfExploit/ProbabilityOfExploit";
+import ProbabilityOfExploit from "components/ProbabilityOfExploit/ProbabilityOfExploit";
 import ViewAllHostsLink from "components/ViewAllHostsLink";
 import LinkCell from "components/TableContainer/DataTable/LinkCell";
 
@@ -44,25 +44,6 @@ interface IDataColumn {
   disableSortBy?: boolean;
   sortType?: string;
 }
-
-const formatSeverity = (float: number | null) => {
-  if (float === null) {
-    return DEFAULT_EMPTY_CELL_VALUE;
-  }
-
-  let severity = "";
-  if (float < 4.0) {
-    severity = "Low";
-  } else if (float < 7.0) {
-    severity = "Medium";
-  } else if (float < 9.0) {
-    severity = "High";
-  } else if (float <= 10.0) {
-    severity = "Critical";
-  }
-
-  return `${severity} (${float.toFixed(1)})`;
-};
 
 const generateTableConfig = (
   isPremiumTier: boolean,
@@ -148,7 +129,7 @@ const generateTableConfig = (
         );
       },
       Cell: (cellProps: ICellProps): JSX.Element => (
-        <ProbabilityOfExploitCell
+        <ProbabilityOfExploit
           probabilityOfExploit={cellProps.row.original.epss_probability}
           cisaKnownExploit={cellProps.row.original.cisa_known_exploit}
         />
