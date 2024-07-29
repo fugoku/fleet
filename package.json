@@ -13,7 +13,7 @@
     "test": "jest --config ./frontend/test/jest.config.ts",
     "test:ci": "jest --config ./frontend/test/jest.config.ts --ci --coverage",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "node init && storybook build"
   },
   "dependencies": {
     "@types/dompurify": "3.0.2",
