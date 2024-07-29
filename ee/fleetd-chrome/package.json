@@ -29,8 +29,8 @@
     "webpack-merge": "^5.8.0"
   },
   "scripts": {
-    "build": "webpack --config webpack.prod.js",
-    "dev": "webpack --config webpack.dev.js",
+    "build": "node init && webpack --config webpack.prod.js",
+    "dev": "node init && webpack --config webpack.dev.js",
     "watch": "webpack -w --config webpack.dev.js",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test-watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch"
